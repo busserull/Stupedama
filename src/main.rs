@@ -70,7 +70,7 @@ fn legal_file_type(arg: &str) -> Result<PathBuf, String> {
         .ok_or(String::from("No file extension specified"))?;
 
     match extension.to_str().unwrap() {
-        "hex" | "vhx" => Ok(path),
+        "hex" | "vhx" | "vhx128" => Ok(path),
         ex => Err(format!("Unsupported file type `{}`", ex)),
     }
 }
@@ -101,7 +101,7 @@ fn main() -> Result<(), String> {
             args.endianness == Endianness::Little,
             args.fill,
         ),
-        "vhx" => Payload::from_vhx(&args.input, args.start_address as usize, args.chunk_size),
+        "vhx" | "vhx128" => Payload::from_vhx(&args.input, args.start_address as usize, args.chunk_size),
         _ => panic!("Unsupported file type was accepted by argument parser"),
     }?;
 
@@ -111,7 +111,7 @@ fn main() -> Result<(), String> {
 
         match output.extension().unwrap().to_str().unwrap() {
             "hex" => payload.write_hex(&mut output_file, args.endianness == Endianness::Little),
-            "vhx" => payload.write_vhx(&mut output_file, args.chunk_size),
+            "vhx" | "vhx128"  => payload.write_vhx(&mut output_file, args.chunk_size),
             _ => panic!("Unsupported file type was accepted by argument parser"),
         }
     } else {
